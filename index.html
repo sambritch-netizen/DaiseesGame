@@ -3,64 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Daisee's Game - Woofie Finds His Way Home</title>
+    <title>Daisee's Game</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            background: #1a0a2e;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        #game-container {
-            width: 100%;
-            height: 100%;
-        }
-        canvas { display: block; }
-
-        /* Show rotate message in portrait, hide in landscape */
+        html, body { background: #1a0a2e; width: 100%; height: 100%; overflow: hidden; }
+        canvas { display: block; position: absolute; }
         #rotate-msg {
             display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #1a0a2e;
-            color: #FF69B4;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px;
-            z-index: 9999;
-            line-height: 2;
+            position: fixed; inset: 0;
+            background: #1a0a2e; color: #FF69B4;
+            font: 24px Arial; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 40px; z-index: 9999; line-height: 2;
         }
-        @media (orientation: portrait) {
-            #rotate-msg { display: flex; }
-        }
+        @media (orientation: portrait) { #rotate-msg { display: flex; } }
     </style>
 </head>
 <body>
-    <div id="rotate-msg">
-        🐾<br>
-        <strong style="font-size:28px">Daisee's Game</strong><br>
-        Please rotate your phone<br>
-        <strong>sideways</strong> to play! 📱↔️
-    </div>
-    <div id="game-container">
-        <div id="loading-msg" style="color:#FF69B4;font-family:Arial;font-size:22px;text-align:center;padding-top:40vh;">
-            🐾 Loading Daisee's Game...
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="js/GameUtils.js"></script>
-    <script src="js/BootScene.js"></script>
-    <script src="js/TitleScene.js"></script>
-    <script src="js/BedroomScene.js"></script>
-    <script src="js/HallwayScene.js"></script>
-    <script src="js/LivingRoomScene.js"></script>
-    <script src="js/KitchenScene.js"></script>
-    <script src="js/WinScene.js"></script>
-    <script src="js/main.js"></script>
+    <div id="rotate-msg">🐾<br><strong style="font-size:28px">Daisee's Game</strong><br>
+        Rotate your phone <strong>sideways</strong> to play! 📱↔️</div>
+    <canvas id="game"></canvas>
+    <script src="js/engine.js"></script>
+    <script src="js/drawing.js"></script>
+    <script src="js/scenes.js"></script>
 </body>
 </html>

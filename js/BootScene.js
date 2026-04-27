@@ -2,12 +2,16 @@ class BootScene extends Phaser.Scene {
     constructor() { super('BootScene'); }
 
     create() {
-        this.createPixelTexture();
-        this.createWoofieTexture();
-        this.createIvanTexture();
-        this.createRocketTexture();
-        this.createDaiseeTexture();
-        this.createCardTextures();
+        try {
+            this.createPixelTexture();
+            this.createWoofieTexture();
+            this.createIvanTexture();
+            this.createRocketTexture();
+            this.createDaiseeTexture();
+            this.createCardTextures();
+        } catch (e) {
+            console.error('Boot error:', e);
+        }
         this.scene.start('TitleScene');
     }
 

@@ -41,7 +41,52 @@ function makeMatchGame(pairs, onWin) {
     const j = Math.floor(Math.random()*(i+1));
     [symbols[i],symbols[j]]=[symbols[j],symbols[i]];
   }
-  const icons = ['🦴','⚽','⭐','❤️','🐾','🎀'];
+  // card icon drawing functions (no emoji - unreliable on mobile canvas)
+  const iconColors = ['#FF69B4','#66aaff','#ffe066','#ff6655','#88dd44','#cc66ff'];
+  function drawIcon(v, cx, cy) {
+    ctx.save();
+    ctx.fillStyle = iconColors[v];
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+    if (v === 0) { // bone shape
+      ctx.beginPath(); ctx.arc(cx-14,cy,7,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+14,cy,7,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(cx-14,cy-4,28,8);
+      ctx.beginPath(); ctx.arc(cx-14,cy-8,5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+14,cy-8,5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx-14,cy+8,5,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+14,cy+8,5,0,Math.PI*2); ctx.fill();
+    } else if (v === 1) { // ball / circle with lines
+      ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#fff4'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx,cy,18,0.5,2.5); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,18,Math.PI+0.5,Math.PI+2.5); ctx.stroke();
+    } else if (v === 2) { // star
+      ctx.beginPath();
+      for (let i=0;i<5;i++) {
+        const a = i*Math.PI*2/5 - Math.PI/2;
+        const b = a + Math.PI/5;
+        i===0 ? ctx.moveTo(cx+Math.cos(a)*20,cy+Math.sin(a)*20) : ctx.lineTo(cx+Math.cos(a)*20,cy+Math.sin(a)*20);
+        ctx.lineTo(cx+Math.cos(b)*9,cy+Math.sin(b)*9);
+      }
+      ctx.closePath(); ctx.fill();
+    } else if (v === 3) { // heart
+      ctx.beginPath();
+      ctx.moveTo(cx,cy+14);
+      ctx.bezierCurveTo(cx-22,cy,cx-22,cy-16,cx,cy-8);
+      ctx.bezierCurveTo(cx+22,cy-16,cx+22,cy,cx,cy+14);
+      ctx.fill();
+    } else if (v === 4) { // paw - circle + dots
+      ctx.beginPath(); ctx.arc(cx,cy+6,12,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx-12,cy-6,6,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx,cy-12,6,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+12,cy-6,6,0,Math.PI*2); ctx.fill();
+    } else { // diamond
+      ctx.beginPath();
+      ctx.moveTo(cx,cy-20); ctx.lineTo(cx+14,cy); ctx.lineTo(cx,cy+20); ctx.lineTo(cx-14,cy);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
   const cols = pairs === 3 ? 3 : 4;
   const rows = 2;
   const cw = 90, ch = 90, gx = (W - cols*cw - (cols-1)*10)/2, gy = 160;
@@ -85,11 +130,7 @@ function makeMatchGame(pairs, onWin) {
         roundRect(ctx, c.x, c.y, cw, ch, 10);
         ctx.fill(); ctx.stroke();
         if (c.flipped || c.matched) {
-          ctx.font = '44px Arial';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#fff';
-          ctx.fillText(icons[c.v], c.x+cw/2, c.y+ch/2);
+          drawIcon(c.v, c.x+cw/2, c.y+ch/2);
         } else {
           ctx.fillStyle = '#cc66ff';
           ctx.font = 'bold 36px Arial';
@@ -427,7 +468,7 @@ const KitchenScene = {
         "Daisee: I missed you so much!",
         "Daisee: You're the best dog ever!",
         "Woofie: *happy tail wags*",
-        "You found Daisee! 🎉"
+        "You found Daisee! Hooray!"
       ], () => fade.fadeOut(()=>setScene(WinScene)));
     }
     if (this.px<30 && this.py>230 && this.py<400) fade.fadeOut(()=>setScene(LivingRoomScene));
@@ -481,7 +522,7 @@ const KitchenScene = {
           "Daisee: I missed you so much!",
           "Daisee: You're the best dog ever!",
           "Woofie: *happy tail wags*",
-          "You found Daisee! 🎉"
+          "You found Daisee! Hooray!"
         ], ()=>fade.fadeOut(()=>setScene(WinScene)));
       }
     }
@@ -527,7 +568,7 @@ const WinScene = {
     ctx.fillText('Woofie found Daisee!', W/2, 185);
     ctx.font='20px Arial';
     ctx.fillStyle='#FF69B4';
-    ctx.fillText('Together again! 🐾❤️', W/2, 220);
+    ctx.fillText('Together again!', W/2, 220);
     // draw all 4 characters
     drawWoofie(ctx, 140, 380, 1.6);
     drawIvan(ctx, 300, 380, 1.5);

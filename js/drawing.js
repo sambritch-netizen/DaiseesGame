@@ -138,7 +138,7 @@ function drawDaisee(ctx, x, y, scale) {
   ctx.beginPath(); ctx.ellipse(7, 44, 7, 4, 0, 0, Math.PI*2); ctx.fill();
   // pink shirt body
   ctx.fillStyle = '#FF69B4';
-  ctx.beginPath(); ctx.roundRect(-15, 5, 30, 22, 4); ctx.fill();
+  roundRect(ctx, -15, 5, 30, 22, 4); ctx.fill();
   // arms
   ctx.fillStyle = '#FF69B4';
   ctx.fillRect(-24, 7, 10, 16);
@@ -208,11 +208,14 @@ function drawDoor(x, y, w, h, locked) {
   ctx.arc(x + (w > 0 ? w-12 : 12), y + h/2, 5, 0, Math.PI*2);
   ctx.fill();
   if (locked) {
+    // draw a simple padlock shape
+    const lx = x + w/2, ly = y + h/2 - 22;
     ctx.fillStyle = '#c00';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🔒', x + w/2, y + h/2 - 20);
+    ctx.fillRect(lx-7, ly, 14, 11);
+    ctx.strokeStyle = '#c00'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(lx, ly, 7, Math.PI, 0); ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(lx, ly+5, 2.5, 0, Math.PI*2); ctx.fill();
   }
 }
 
@@ -222,9 +225,12 @@ function drawPuzzleBoard(x, y, solved) {
   ctx.lineWidth = 3;
   roundRect(ctx, x, y, 60, 60, 6);
   ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 28px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(solved ? '✓' : '?', x+30, y+30);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (solved) {
+    ctx.beginPath(); ctx.moveTo(x+14, y+30); ctx.lineTo(x+26, y+44); ctx.lineTo(x+48, y+16); ctx.stroke();
+  } else {
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('?', x+30, y+30);
+  }
 }

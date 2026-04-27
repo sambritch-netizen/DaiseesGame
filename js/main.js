@@ -6,7 +6,7 @@ window.GAME_STATE = {
 };
 
 const config = {
-    type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     parent: 'game-container',
     width: 800,
     height: 600,
@@ -23,3 +23,5 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+const loadingEl = document.getElementById('loading-msg');
+if (loadingEl) loadingEl.style.display = 'none';

@@ -15,6 +15,7 @@ class BedroomScene extends Phaser.Scene {
         this.setupInput();
         this.setupUI();
 
+        setupMobileControls(this);
         this.cameras.main.fadeIn(600);
 
         // Show intro dialogue after fade
@@ -230,6 +231,12 @@ class BedroomScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(20).setVisible(false);
 
         this.hintTimer = null;
+
+        // Tap zone for puzzle board (mobile)
+        const pTap = this.add.rectangle(705, 315, 100, 80, 0x000000, 0).setDepth(5).setInteractive();
+        pTap.on('pointerdown', () => {
+            if (!this.puzzleDone && !this.dialogueActive && !this.miniGameActive) this.startMatchingGame();
+        });
     }
 
     showIntro() {
@@ -251,10 +258,10 @@ class BedroomScene extends Phaser.Scene {
         }
 
         const speed = 155;
-        const left = this.cursors.left.isDown || this.wasd.A.isDown;
-        const right = this.cursors.right.isDown || this.wasd.D.isDown;
-        const up = this.cursors.up.isDown || this.wasd.W.isDown;
-        const down = this.cursors.down.isDown || this.wasd.S.isDown;
+        const left = this.cursors.left.isDown || this.wasd.A.isDown || this.dpad.left;
+        const right = this.cursors.right.isDown || this.wasd.D.isDown || this.dpad.right;
+        const up = this.cursors.up.isDown || this.wasd.W.isDown || this.dpad.up;
+        const down = this.cursors.down.isDown || this.wasd.S.isDown || this.dpad.down;
 
         let vx = right ? speed : left ? -speed : 0;
         let vy = down ? speed : up ? -speed : 0;
@@ -462,7 +469,8 @@ class BedroomScene extends Phaser.Scene {
             });
         };
 
-        const advance = () => {
+        const advance = (pointer) => {
+            if (pointer && pointer.x < 170 && pointer.y > 445) return;
             if (typing) {
                 if (timer) { timer.destroy(); timer = null; }
                 bodyText.setText(lines[lineIndex]);

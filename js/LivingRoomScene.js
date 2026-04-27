@@ -15,6 +15,7 @@ class LivingRoomScene extends Phaser.Scene {
         this.setupInput();
         this.setupUI();
 
+        setupMobileControls(this);
         this.cameras.main.fadeIn(500);
     }
 
@@ -243,6 +244,14 @@ class LivingRoomScene extends Phaser.Scene {
             onRepeat: () => this.rocket.setFlipX(true)
         });
 
+        // Tap Rocket directly to talk (mobile)
+        this.rocket.setInteractive();
+        this.rocket.on('pointerdown', () => {
+            if (this.dialogueActive || this.miniGameActive) return;
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.rocket.x, this.rocket.y);
+            if (dist < 180) this.talkToRocket();
+        });
+
         this.rocketBubble = this.add.text(0, 0, '!', {
             fontSize: '32px', fontFamily: 'Arial', fontStyle: 'bold',
             color: '#FF4400', stroke: '#ffffff', strokeThickness: 4
@@ -273,6 +282,12 @@ class LivingRoomScene extends Phaser.Scene {
             align: 'center', stroke: '#ffffff', strokeThickness: 2
         }).setOrigin(0.5).setDepth(20).setVisible(false);
         this.hintTimer = null;
+
+        // Tap zone for puzzle board (mobile)
+        const pTap = this.add.rectangle(710, 320, 100, 80, 0x000000, 0).setDepth(5).setInteractive();
+        pTap.on('pointerdown', () => {
+            if (!this.puzzleDone && !this.dialogueActive && !this.miniGameActive) this.startMemoryGame();
+        });
     }
 
     update() {
@@ -282,10 +297,10 @@ class LivingRoomScene extends Phaser.Scene {
         }
 
         const speed = 155;
-        const left = this.cursors.left.isDown || this.wasd.A.isDown;
-        const right = this.cursors.right.isDown || this.wasd.D.isDown;
-        const up = this.cursors.up.isDown || this.wasd.W.isDown;
-        const down = this.cursors.down.isDown || this.wasd.S.isDown;
+        const left = this.cursors.left.isDown || this.wasd.A.isDown || this.dpad.left;
+        const right = this.cursors.right.isDown || this.wasd.D.isDown || this.dpad.right;
+        const up = this.cursors.up.isDown || this.wasd.W.isDown || this.dpad.up;
+        const down = this.cursors.down.isDown || this.wasd.S.isDown || this.dpad.down;
 
         let vx = right ? speed : left ? -speed : 0;
         let vy = down ? speed : up ? -speed : 0;
@@ -548,7 +563,8 @@ class LivingRoomScene extends Phaser.Scene {
             });
         };
 
-        const advance = () => {
+        const advance = (pointer) => {
+            if (pointer && pointer.x < 170 && pointer.y > 445) return;
             if (typing) {
                 if (timer) { timer.destroy(); timer = null; }
                 bodyText.setText(lines[lineIndex]);

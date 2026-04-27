@@ -13,6 +13,7 @@ class KitchenScene extends Phaser.Scene {
         this.setupInput();
         this.setupUI();
 
+        setupMobileControls(this);
         this.cameras.main.fadeIn(600);
     }
 
@@ -230,6 +231,14 @@ class KitchenScene extends Phaser.Scene {
         // Daisee stands near the table, facing the player
         this.daisee = this.add.image(430, 450, 'daisee').setScale(0.88).setDepth(11);
 
+        // Tap Daisee directly (mobile)
+        this.daisee.setInteractive();
+        this.daisee.on('pointerdown', () => {
+            if (this.dialogueActive || this.daiseeMet) return;
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.daisee.x, this.daisee.y);
+            if (dist < 200) this.meetDaisee();
+        });
+
         // Gentle idle bounce
         this.tweens.add({
             targets: this.daisee,
@@ -277,10 +286,10 @@ class KitchenScene extends Phaser.Scene {
         }
 
         const speed = 155;
-        const left = this.cursors.left.isDown || this.wasd.A.isDown;
-        const right = this.cursors.right.isDown || this.wasd.D.isDown;
-        const up = this.cursors.up.isDown || this.wasd.W.isDown;
-        const down = this.cursors.down.isDown || this.wasd.S.isDown;
+        const left = this.cursors.left.isDown || this.wasd.A.isDown || this.dpad.left;
+        const right = this.cursors.right.isDown || this.wasd.D.isDown || this.dpad.right;
+        const up = this.cursors.up.isDown || this.wasd.W.isDown || this.dpad.up;
+        const down = this.cursors.down.isDown || this.wasd.S.isDown || this.dpad.down;
 
         let vx = right ? speed : left ? -speed : 0;
         let vy = down ? speed : up ? -speed : 0;
@@ -395,7 +404,8 @@ class KitchenScene extends Phaser.Scene {
             });
         };
 
-        const advance = () => {
+        const advance = (pointer) => {
+            if (pointer && pointer.x < 170 && pointer.y > 445) return;
             if (typing) {
                 if (timer) { timer.destroy(); timer = null; }
                 bodyText.setText(lines[lineIndex]);
